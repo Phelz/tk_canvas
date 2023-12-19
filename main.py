@@ -17,7 +17,6 @@ ALL_IMG_PATHS = list(pathlib.Path("pictures").glob("*.jpg"))
 # random.shuffle(ALL_IMG_PATHS)  # Shuffle the images
 
 
-
 root = tk.Tk()
 root.title("Tkinter Canvas App")
 root.geometry(f"{WIDTH}x{HEIGHT}")
@@ -26,6 +25,7 @@ canvas = tk.Canvas(root, bg="white")
 canvas.pack(fill="both", expand=True)
 
 # * Images * #
+
 def load_image(path):
     img = cv2.imread(str(path))
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -65,16 +65,16 @@ def create_display_image(text, font=ImageFont.truetype("arialbd.ttf", 20), width
 
 def update_time():
     global time_image_ref  
-    time_img = create_display_image(datetime.now().strftime("%H:%M:%S %p"),
-                                    width=400, height=200)
-    
+    time_img = create_display_image(datetime.now().strftime("%H:%M:%S %p"), width=400, height=200)
     time_image_ref = ImageTk.PhotoImage(image=time_img)
 
     canvas.itemconfig(time_image_id, image=time_image_ref)
     root.after(1000, update_time)
 
-time_image_ref = ImageTk.PhotoImage(image=create_display_image(datetime.now().strftime("%H:%M:%S %p"), width=400, height=200))
-time_image_id = canvas.create_image(WIDTH//2, HEIGHT//2, anchor="nw", image=time_image_ref)
+# initialize the time display
+time_image     = create_display_image(datetime.now().strftime("%H:%M:%S %p"), width=400, height=200)
+time_image_ref = ImageTk.PhotoImage(image=time_image)
+time_image_id  = canvas.create_image(WIDTH//2, HEIGHT//2, anchor="nw", image=time_image_ref)
 
 update_time()
 
@@ -94,20 +94,20 @@ def call_weather_api():
     return weather_str
 
 def update_weather():
-
+    global weather_image_ref
     weather_img = create_display_image(call_weather_api())
     weather_image_ref = ImageTk.PhotoImage(image=weather_img)
 
     canvas.itemconfig(weather_image_id, image=weather_image_ref)
     root.after(60_000, update_weather)  # Update every 10 minutes
 
-weather_img = create_display_image(call_weather_api())
+# initialize the weather display
+weather_img       = create_display_image(call_weather_api())
 weather_image_ref = ImageTk.PhotoImage(image=weather_img)
+weather_image_id  = canvas.create_image(WIDTH//2, HEIGHT//3, anchor="nw", image=weather_image_ref)
 
-weather_image_id = canvas.create_image(WIDTH//2, HEIGHT//3, anchor="nw", image=weather_image_ref)
-
+update_weather()
 
 # * Event Binds * #
-
 root.bind("<Configure>", resize_and_center_bg)
 root.mainloop()
